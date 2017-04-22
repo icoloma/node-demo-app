@@ -8,7 +8,7 @@
     "url": "github.com/icoloma/node-demo-app"
   },
   "author": "Nacho Coloma <icoloma@google.com>",
-  "license": "Apache 2",
+  "license": "Apache-2.0",
   "dependencies": {
     "express": "^4.15.2"
   },
@@ -16,6 +16,7 @@
     "mocha": "^3.2.0"
   },
   "scripts": {
-    "test": "node_modules/.bin/mocha test/*"
+    "test": "node_modules/.bin/mocha test/*",
+    "dev": "./app.js"
   }
 }
