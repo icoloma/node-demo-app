@@ -1,0 +1,21 @@
+{
+  "name": "node-demo-app",
+  "version": "0.0.1",
+  "description": "Just a simple node example",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "github.com/icoloma/node-demo-app"
+  },
+  "author": "Nacho Coloma <icoloma@google.com>",
+  "license": "Apache 2",
+  "dependencies": {
+    "express": "^4.15.2"
+  },
+  "devDependencies": {
+    "mocha": "^3.2.0"
+  },
+  "scripts": {
+    "test": "node_modules/.bin/mocha test/*"
+  }
+}
