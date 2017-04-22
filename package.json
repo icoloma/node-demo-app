@@ -13,10 +13,11 @@
     "express": "^4.15.2"
   },
   "devDependencies": {
-    "mocha": "^3.2.0"
+    "mocha": "^3.2.0",
+    "xunit-file": "^1.0.0"
   },
   "scripts": {
-    "test": "node_modules/.bin/mocha test/*",
+    "test": "XUNIT_FILE=output/xunit.xml node_modules/.bin/mocha test/* --reporter xunit-file ",
     "dev": "./app.js"
   }
 }
