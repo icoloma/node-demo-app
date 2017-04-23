@@ -29,49 +29,50 @@ node {
 
     // Run inside of node.js image
     docker.image('node').inside {
-    try {
-    
-      stage('Test') {
+      try {
+      
+        stage('Test') {
 
-        env.NODE_ENV = "test"
-        print "Environment will be : ${env.NODE_ENV}"
+          env.NODE_ENV = "test"
+          print "Environment will be : ${env.NODE_ENV}"
 
-        // run all tests in package.json
-        sh 'node -v'
-        sh 'npm prune'
-        sh 'npm install'
-        sh 'npm test'
+          // run all tests in package.json
+          sh 'node -v'
+          sh 'npm prune'
+          sh 'npm install'
+          sh 'npm test'
 
+        }
+
+        stage('Build Docker') {
+
+          print "Publishing container to gcr.io/${env.GCP_PROJECT}/node-demo-app"
+
+          // capture package version
+          // http://stackoverflow.com/questions/36507410/is-it-possible-to-capture-the-stdout-from-the-sh-dsl-command-in-the-pipeline 
+          env.PACKAGE_VERSION=sh(returnStdout: true, script: 'node -p -e "require(\'./package.json\').version"').trim()
+
+          sh "gcloud container builds submit . --tag gcr.io/${env.GCP_PROJECT}/node-demo-app --tag version:${PACKAGE_VERSION}"
+        }
+
+        stage('Deploy') {
+
+            echo 'Kubernetes deploy goes here'
+
+        }
+
+      } catch (err) {
+
+        currentBuild.result = "FAILURE"
+    /*
+          mail body: "project build error is here: ${env.BUILD_URL}" ,
+          from: 'xxxx@yyyy.com',
+          replyTo: 'yyyy@yyyy.com',
+          subject: 'project build failed',
+          to: 'zzzz@yyyyy.com'
+    */
+        throw err
       }
-
-      stage('Build Docker') {
-
-        print "Publishing container to gcr.io/${env.GCP_PROJECT}/node-demo-app"
-
-        // capture package version
-        // http://stackoverflow.com/questions/36507410/is-it-possible-to-capture-the-stdout-from-the-sh-dsl-command-in-the-pipeline 
-        env.PACKAGE_VERSION=sh(returnStdout: true, script: 'node -p -e "require(\'./package.json\').version"').trim()
-
-        sh "gcloud container builds submit . --tag gcr.io/${env.GCP_PROJECT}/node-demo-app --tag version:${PACKAGE_VERSION}"
-      }
-
-      stage('Deploy') {
-
-          echo 'Kubernetes deploy goes here'
-
-      }
-
-    } catch (err) {
-
-      currentBuild.result = "FAILURE"
-  /*
-        mail body: "project build error is here: ${env.BUILD_URL}" ,
-        from: 'xxxx@yyyy.com',
-        replyTo: 'yyyy@yyyy.com',
-        subject: 'project build failed',
-        to: 'zzzz@yyyyy.com'
-  */
-      throw err
     }
 
   }
