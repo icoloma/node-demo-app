@@ -27,8 +27,11 @@ node {
     // checkout sources
     checkout scm
 
+    sh 'curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -'
+    sh 'sudo apt-get install -y nodejs'
+
     // Run inside of node.js image
-    docker.image('node').inside {
+    //docker.image('node').inside {
       try {
       
         stage('Test') {
@@ -38,8 +41,7 @@ node {
 
           // run all tests in package.json
           sh 'node -v'
-          sh 'npm prune'
-          sh 'npm install'
+          sh 'npm prune && npm install'
           sh 'npm test'
 
         }
@@ -73,7 +75,7 @@ node {
     */
         throw err
       }
-    }
+    //}
 
   }
 
