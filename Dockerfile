@@ -1,4 +1,4 @@
-FROM node:0.12
+FROM node:7
 WORKDIR /app
 COPY static static
 COPY app.js package.json ./
