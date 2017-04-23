@@ -21,25 +21,30 @@
 node {
 
   currentBuild.result = "SUCCESS"
-  
-  nodejs(nodeJSInstallationName: 'Node 7.9') {
+
+  stage('Prepare environment') {
+
+    // checkout sources
+    checkout scm
+
+    // Run inside of node.js image
+    docker.image('node').inside {
     try {
-
-      stage 'Checkout'
     
-        checkout scm
-
-      stage 'Test'
+      stage('Test') {
 
         env.NODE_ENV = "test"
         print "Environment will be : ${env.NODE_ENV}"
 
+        // run all tests in package.json
         sh 'node -v'
         sh 'npm prune'
         sh 'npm install'
         sh 'npm test'
 
-      stage 'Build Docker'
+      }
+
+      stage('Build Docker') {
 
         print "Publishing container to gcr.io/${env.GCP_PROJECT}/node-demo-app"
 
@@ -48,16 +53,13 @@ node {
         env.PACKAGE_VERSION=sh(returnStdout: true, script: 'node -p -e "require(\'./package.json\').version"').trim()
 
         sh "gcloud container builds submit . --tag gcr.io/${env.GCP_PROJECT}/node-demo-app --tag version:${PACKAGE_VERSION}"
+      }
 
-      stage 'Deploy'
+      stage('Deploy') {
 
           echo 'Kubernetes deploy goes here'
 
-      stage 'Cleanup'
-
-          echo 'Prune and cleanup'
-          sh 'npm prune'
-          sh 'rm node_modules -rf'
+      }
 
     } catch (err) {
 
@@ -73,4 +75,5 @@ node {
     }
 
   }
+
 }
