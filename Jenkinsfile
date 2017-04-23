@@ -27,11 +27,12 @@ node {
     // checkout sources
     checkout scm
 
-    sh 'curl -sL https://deb.nodesource.com/setup_7.x | bash'
-    sh 'apt-get install -y nodejs'
+    // quick test
+    def nodeHome = tool name: 'node-5.10.1', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
+    sh "${nodeHome}/bin/node -v"
 
     // Run inside of node.js image
-    //docker.image('node').inside {
+    docker.image('node').inside {
       try {
       
         stage('Test') {
@@ -75,7 +76,7 @@ node {
     */
         throw err
       }
-    //}
+    }
 
   }
 
