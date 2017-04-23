@@ -7,7 +7,7 @@ This repository contains a simple node.js sample app.
 ./app.js
 
 # Compile in the cloud and upload to GCR
-docker build -t gcr.io/${PROJECT_ID}/hello-node .
+gcloud container builds submit . --tag "gcr.io/$(gcloud config list --format 'value(core.project)')/node-demo-app"
 
 # Compile and test in the local environment (needed only for debugging)
 docker build . -q

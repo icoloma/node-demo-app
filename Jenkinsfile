@@ -27,8 +27,8 @@ node {
     // checkout sources
     checkout scm
 
-    sh 'curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -'
-    sh 'sudo apt-get install -y nodejs'
+    sh 'curl -sL https://deb.nodesource.com/setup_7.x | bash'
+    sh 'apt-get install -y nodejs'
 
     // Run inside of node.js image
     //docker.image('node').inside {
