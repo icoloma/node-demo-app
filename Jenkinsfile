@@ -18,9 +18,30 @@
 
 */
 
+pipeline {
+  agent { docker 'node:6.3' }
+  stages {
+    stage('Prepare environment') {
+      // checkout sources
+      checkout scm
+      sh "${nodeHome}/bin/node -v"
+    }
+    stage('Test') {
+
+      env.NODE_ENV = "test"
+      print "Environment will be : ${env.NODE_ENV}"
+
+      // run all tests in package.json
+      sh 'node -v'
+      sh 'npm prune && npm install'
+      sh 'npm test'
+
+    }
+  }
+}
+/*
 node {
 
-  agent { docker 'node:6.3' }
 
   currentBuild.result = "SUCCESS"
 
@@ -70,13 +91,12 @@ node {
       } catch (err) {
 
         currentBuild.result = "FAILURE"
-    /*
-          mail body: "project build error is here: ${env.BUILD_URL}" ,
-          from: 'xxxx@yyyy.com',
-          replyTo: 'yyyy@yyyy.com',
-          subject: 'project build failed',
-          to: 'zzzz@yyyyy.com'
-    */
+    //      mail body: "project build error is here: ${env.BUILD_URL}" ,
+    //      from: 'xxxx@yyyy.com',
+    //      replyTo: 'yyyy@yyyy.com',
+    //      subject: 'project build failed',
+    //      to: 'zzzz@yyyyy.com'
+    
         throw err
       }
     }
@@ -84,3 +104,4 @@ node {
   }
 
 }
+*/
