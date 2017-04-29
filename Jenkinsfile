@@ -28,13 +28,13 @@ node {
     checkout scm
 
     // quick test
-    def nodeHome = tool name: 'node-5.10.1', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
-    sh "${nodeHome}/bin/node -v"
+    //def nodeHome = tool name: 'node-5.10.1', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
 
     // Run inside of node.js image
     docker.image('node').inside {
       try {
       
+        sh "${nodeHome}/bin/node -v"
         stage('Test') {
 
           env.NODE_ENV = "test"
