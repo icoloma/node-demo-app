@@ -28,13 +28,10 @@ pipeline {
         checkout scm
         sh "${nodeHome}/bin/node -v"
 
-        env.NODE_ENV = "test"
-        print "Environment will be : ${env.NODE_ENV}"
-
         // run all tests in package.json
         sh 'node -v'
         sh 'npm prune && npm install'
-        sh 'npm test'
+        sh 'NODE_ENV=test npm test'
       }
     }
   }
