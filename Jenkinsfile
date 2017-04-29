@@ -18,75 +18,51 @@
 
 */
 
-/*
-pipeline {
-  agent { docker 'node:6.3' }
-  stages {
-    stage('test') {
-      steps {
-
-        // checkout sources
-        checkout scm
-
-        // run all tests in package.json
-        sh 'node -v'
-        sh 'npm prune && npm install'
-        sh 'NODE_ENV=test npm test'
-      }
-    }
-  }
-}
-*/
-node('slave') {
-
+node {
 
   currentBuild.result = "SUCCESS"
 
-  stage('Prepare environment') {
+  // checkout sources
+  checkout scm
 
-    // checkout sources
-    checkout scm
-
-    try {
-    
-      stage('Test') {
-
-        // run all tests in package.json
-        sh '/usr/bin/node -v'
-        sh '/usr/bin/npm install'
-        sh 'NODE_ENV=test /usr/bin/npm test'
-
-      }
-
-      stage('Build Docker') {
-
-        print "Publishing container to gcr.io/${env.GCP_PROJECT}/node-demo-app"
-
-        // capture package version
-        // http://stackoverflow.com/questions/36507410/is-it-possible-to-capture-the-stdout-from-the-sh-dsl-command-in-the-pipeline 
-        env.PACKAGE_VERSION=sh(returnStdout: true, script: 'node -p -e "require(\'./package.json\').version"').trim()
-
-        sh "gcloud container builds submit . --tag gcr.io/${env.GCP_PROJECT}/node-demo-app --tag version:${PACKAGE_VERSION}"
-      }
-
-      stage('Deploy') {
-
-          echo 'Kubernetes deploy goes here'
-
-      }
-
-    } catch (err) {
-
-      currentBuild.result = "FAILURE"
-      // mail body: "project build error is here: ${env.BUILD_URL}" ,
-      // from: 'xxxx@yyyy.com',
-      // replyTo: 'yyyy@yyyy.com',
-      // subject: 'project build failed',
-      // to: 'zzzz@yyyyy.com'
+  try {
   
-      throw err
+    stage('Test') {
+
+      // run all tests in package.json
+      sh '/usr/bin/node -v'
+      sh '/usr/bin/npm install'
+      sh 'NODE_ENV=test /usr/bin/npm test'
+
     }
 
+    stage('Build Docker') {
+
+      print "Publishing container to gcr.io/${env.GCP_PROJECT}/node-demo-app"
+
+      // capture package version
+      // http://stackoverflow.com/questions/36507410/is-it-possible-to-capture-the-stdout-from-the-sh-dsl-command-in-the-pipeline 
+      env.PACKAGE_VERSION=sh(returnStdout: true, script: 'node -p -e "require(\'./package.json\').version"').trim()
+
+      sh "gcloud container builds submit . --tag gcr.io/${env.GCP_PROJECT}/node-demo-app --tag version:${PACKAGE_VERSION}"
+    }
+
+    stage('Deploy') {
+
+        echo 'Kubernetes deploy goes here'
+
+    }
+
+  } catch (err) {
+
+    currentBuild.result = "FAILURE"
+    // mail body: "project build error is here: ${env.BUILD_URL}" ,
+    // from: 'xxxx@yyyy.com',
+    // replyTo: 'yyyy@yyyy.com',
+    // subject: 'project build failed',
+    // to: 'zzzz@yyyyy.com'
+
+    throw err
   }
 
 }
