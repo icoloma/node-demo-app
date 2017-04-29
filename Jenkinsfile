@@ -21,21 +21,21 @@
 pipeline {
   agent { docker 'node:6.3' }
   stages {
-    stage('Prepare environment') {
-      // checkout sources
-      checkout scm
-      sh "${nodeHome}/bin/node -v"
-    }
-    stage('Test') {
+    stage('test') {
+      steps {
 
-      env.NODE_ENV = "test"
-      print "Environment will be : ${env.NODE_ENV}"
+        // checkout sources
+        checkout scm
+        sh "${nodeHome}/bin/node -v"
 
-      // run all tests in package.json
-      sh 'node -v'
-      sh 'npm prune && npm install'
-      sh 'npm test'
+        env.NODE_ENV = "test"
+        print "Environment will be : ${env.NODE_ENV}"
 
+        // run all tests in package.json
+        sh 'node -v'
+        sh 'npm prune && npm install'
+        sh 'npm test'
+      }
     }
   }
 }
