@@ -20,6 +20,8 @@
 
 node {
 
+  agent { docker 'node:6.3' }
+
   currentBuild.result = "SUCCESS"
 
   stage('Prepare environment') {
@@ -31,7 +33,7 @@ node {
     //def nodeHome = tool name: 'node-5.10.1', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
 
     // Run inside of node.js image
-    sh('systemctl start docker')
+    //sh('systemctl start docker')
     docker.image('node').inside {
       try {
       
