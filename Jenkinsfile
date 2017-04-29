@@ -29,8 +29,6 @@ node {
   
     stage('Test') {
 
-      sh 'docker images'
-
       // run all tests in package.json
       sh 'node -v'
       sh 'npm install'
