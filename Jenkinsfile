@@ -57,9 +57,9 @@ node {
         stage('Test') {
 
           // run all tests in package.json
-          sh 'node -v'
-          sh 'npm prune && npm install'
-          sh 'NODE_ENV=test npm test'
+          sh '/usr/bin/node -v'
+          sh '/usr/bin/npm install'
+          sh 'NODE_ENV=test /usr/bin/npm test'
 
         }
 
