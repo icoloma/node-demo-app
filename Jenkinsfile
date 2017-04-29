@@ -37,7 +37,7 @@ pipeline {
   }
 }
 */
-node {
+node('slave') {
 
 
   currentBuild.result = "SUCCESS"
@@ -47,50 +47,45 @@ node {
     // checkout sources
     checkout scm
 
-    // quick test
-    //def nodeHome = tool name: 'node-5.10.1', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
-
-    // Run inside of node.js image
-    //sh('systemctl start docker')
-      try {
-      
-        stage('Test') {
-
-          // run all tests in package.json
-          sh '/usr/bin/node -v'
-          sh '/usr/bin/npm install'
-          sh 'NODE_ENV=test /usr/bin/npm test'
-
-        }
-
-        stage('Build Docker') {
-
-          print "Publishing container to gcr.io/${env.GCP_PROJECT}/node-demo-app"
-
-          // capture package version
-          // http://stackoverflow.com/questions/36507410/is-it-possible-to-capture-the-stdout-from-the-sh-dsl-command-in-the-pipeline 
-          env.PACKAGE_VERSION=sh(returnStdout: true, script: 'node -p -e "require(\'./package.json\').version"').trim()
-
-          sh "gcloud container builds submit . --tag gcr.io/${env.GCP_PROJECT}/node-demo-app --tag version:${PACKAGE_VERSION}"
-        }
-
-        stage('Deploy') {
-
-            echo 'Kubernetes deploy goes here'
-
-        }
-
-      } catch (err) {
-
-        currentBuild.result = "FAILURE"
-    //      mail body: "project build error is here: ${env.BUILD_URL}" ,
-    //      from: 'xxxx@yyyy.com',
-    //      replyTo: 'yyyy@yyyy.com',
-    //      subject: 'project build failed',
-    //      to: 'zzzz@yyyyy.com'
+    try {
     
-        throw err
+      stage('Test') {
+
+        // run all tests in package.json
+        sh '/usr/bin/node -v'
+        sh '/usr/bin/npm install'
+        sh 'NODE_ENV=test /usr/bin/npm test'
+
       }
+
+      stage('Build Docker') {
+
+        print "Publishing container to gcr.io/${env.GCP_PROJECT}/node-demo-app"
+
+        // capture package version
+        // http://stackoverflow.com/questions/36507410/is-it-possible-to-capture-the-stdout-from-the-sh-dsl-command-in-the-pipeline 
+        env.PACKAGE_VERSION=sh(returnStdout: true, script: 'node -p -e "require(\'./package.json\').version"').trim()
+
+        sh "gcloud container builds submit . --tag gcr.io/${env.GCP_PROJECT}/node-demo-app --tag version:${PACKAGE_VERSION}"
+      }
+
+      stage('Deploy') {
+
+          echo 'Kubernetes deploy goes here'
+
+      }
+
+    } catch (err) {
+
+      currentBuild.result = "FAILURE"
+      // mail body: "project build error is here: ${env.BUILD_URL}" ,
+      // from: 'xxxx@yyyy.com',
+      // replyTo: 'yyyy@yyyy.com',
+      // subject: 'project build failed',
+      // to: 'zzzz@yyyyy.com'
+  
+      throw err
+    }
 
   }
 
