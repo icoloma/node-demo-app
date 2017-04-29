@@ -54,7 +54,6 @@ node {
     //sh('systemctl start docker')
       try {
       
-        sh "${nodeHome}/bin/node -v"
         stage('Test') {
 
           // run all tests in package.json
