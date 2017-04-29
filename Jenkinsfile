@@ -29,10 +29,12 @@ node {
   
     stage('Test') {
 
+      sh 'docker images'
+
       // run all tests in package.json
-      sh '/usr/bin/node -v'
-      sh '/usr/bin/npm install'
-      sh 'NODE_ENV=test /usr/bin/npm test'
+      sh 'node -v'
+      sh 'npm install'
+      sh 'NODE_ENV=test npm test'
 
     }
 
