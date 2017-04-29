@@ -18,6 +18,7 @@
 
 */
 
+/*
 pipeline {
   agent { docker 'node:6.3' }
   stages {
@@ -36,7 +37,7 @@ pipeline {
     }
   }
 }
-/*
+*/
 node {
 
 
@@ -101,4 +102,3 @@ node {
   }
 
 }
-*/
