@@ -27,7 +27,6 @@ pipeline {
 
         // checkout sources
         checkout scm
-        sh "${nodeHome}/bin/node -v"
 
         // run all tests in package.json
         sh 'node -v'
@@ -53,19 +52,15 @@ node {
 
     // Run inside of node.js image
     //sh('systemctl start docker')
-    docker.image('node').inside {
       try {
       
         sh "${nodeHome}/bin/node -v"
         stage('Test') {
 
-          env.NODE_ENV = "test"
-          print "Environment will be : ${env.NODE_ENV}"
-
           // run all tests in package.json
           sh 'node -v'
           sh 'npm prune && npm install'
-          sh 'npm test'
+          sh 'NODE_ENV=test npm test'
 
         }
 
@@ -97,7 +92,6 @@ node {
     
         throw err
       }
-    }
 
   }
 
