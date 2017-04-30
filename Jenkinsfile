@@ -31,8 +31,8 @@ node {
 
       // run all tests in package.json
       sh 'node -v'
-      sh 'npm install'
-      sh 'NODE_ENV=test npm test'
+      sh 'npm install --no-color'
+      sh 'NODE_ENV=test npm test --no-color'
 
     }
 
@@ -46,12 +46,13 @@ node {
 
       sh "gcloud config set core/project icoloma-42"
       sh "gcloud auth activate-service-account jenkins-demo-service-account@icoloma-42.iam.gserviceaccount.com --key-file=/var/run/secrets/jenkins-demo-secrets/jenkins-demo-service-account.json"
-      sh "gcloud container builds submit . --tag gcr.io/icoloma-42/node-demo-app" //" --tag version:${PACKAGE_VERSION}"
+      sh "gcloud container builds submit . --tag gcr.io/icoloma-42/node-demo-app:${PACKAGE_VERSION} --tag gcr.io/icoloma-42/node-demo-app:latest"
     }
 
     stage('Deploy') {
 
-      echo 'Kubernetes deploy goes here'
+      sh 'gcloud container clusters get-credentials demo-prod'
+      sh 'kubectl get pods' 
 
     }
 
