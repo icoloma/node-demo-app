@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: node-demo-deployment
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        name: node-demo
+    spec:
+      containers:
+        # the Jenkinsfile will replace this value with the build number
+        - image: gcr.io/icoloma-42/node-demo-app:1.0.0
+          name: node-demo-app
+          ports:
+            - containerPort: 3000
+          imagePullPolicy: Always
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000

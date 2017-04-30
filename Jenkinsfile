@@ -1,26 +1,17 @@
 #!groovy
 
-/*
+/**
 
-  Copyright 2015 Google Inc. All rights reserved.
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-      https://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License
+  Example pipeline to deploy this application. Will behave differently depending on the branch it is run on.
+  For an alternative example, see 
+  https://github.com/GoogleCloudPlatform/continuous-deployment-on-kubernetes/blob/master/sample-app/Jenkinsfile
 
 */
-
 node {
 
   currentBuild.result = "SUCCESS"
+  def PROJECT = 'icoloma-42'
+  def IMAGE_TAG = "gcr.io/${PROJECT}/node-demo-app:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
 
   // checkout sources
   checkout scm
@@ -40,19 +31,22 @@ node {
 
       print "Publishing container to gcr.io/${env.GCP_PROJECT}/node-demo-app"
 
-      // capture package version
-      // http://stackoverflow.com/questions/36507410/is-it-possible-to-capture-the-stdout-from-the-sh-dsl-command-in-the-pipeline 
-      env.PACKAGE_VERSION=sh(returnStdout: true, script: 'node -p -e "require(\'./package.json\').version"').trim()
-
-      sh "gcloud config set core/project icoloma-42"
-      sh "gcloud auth activate-service-account jenkins-demo-service-account@icoloma-42.iam.gserviceaccount.com --key-file=/var/run/secrets/jenkins-demo-secrets/jenkins-demo-service-account.json"
-      sh "gcloud container builds submit . --tag gcr.io/icoloma-42/node-demo-app:${PACKAGE_VERSION} --tag gcr.io/icoloma-42/node-demo-app:latest"
+      sh "gcloud config set core/project ${PROJECT}"
+      sh "gcloud auth activate-service-account jenkins-demo-service-account@${PROJECT}.iam.gserviceaccount.com --key-file=/var/run/secrets/jenkins-demo-secrets/jenkins-demo-service-account.json"
+      sh "gcloud container builds submit . --tag ${IMAGE_TAG}"
     }
 
     stage('Deploy') {
 
-      sh 'gcloud container clusters get-credentials demo-prod'
-      sh 'kubectl get pods' 
+      if (env.BRANCH_NAME == "release") {
+        // alternative deployment pipeline for production
+      } else {
+        sh 'gcloud container clusters get-credentials demo-dev'
+        sh "sed -i.bak 's#gcr.io/${PROJECT}/node-demo-app:1.0.0#${IMAGE_TAG}#' k8s/app-deployment.yaml"
+        sh "kubectl apply -f k8s/app-deployment.yaml"
+        sh "kubectl apply -f k8s/app-service.yaml"
+        sh "echo http://`kubectl get service/node-demo-service --output=json | jq -r '.status.loadBalancer.ingress[0].ip'`"
+      }
 
     }
 
