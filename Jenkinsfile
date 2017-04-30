@@ -44,7 +44,7 @@ node {
       // http://stackoverflow.com/questions/36507410/is-it-possible-to-capture-the-stdout-from-the-sh-dsl-command-in-the-pipeline 
       env.PACKAGE_VERSION=sh(returnStdout: true, script: 'node -p -e "require(\'./package.json\').version"').trim()
 
-      sh "gcloud config set core/project icoloma42"
+      sh "gcloud config set core/project icoloma-42"
       sh "gcloud auth activate-service-account jenkins-demo-service-account@icoloma-42.iam.gserviceaccount.com --key-file=/var/run/secrets/jenkins-demo-secrets/jenkins-demo-service-account.json"
       sh "gcloud container builds submit . --tag gcr.io/icoloma-42/node-demo-app" //" --tag version:${PACKAGE_VERSION}"
     }
