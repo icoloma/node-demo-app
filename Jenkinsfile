@@ -11,6 +11,7 @@ node {
 
   currentBuild.result = "SUCCESS"
   def PROJECT = 'icoloma-42'
+  def ZONE = 'europe-west1-c'
   def IMAGE_TAG = "gcr.io/${PROJECT}/node-demo-app:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
 
   // checkout sources
@@ -32,6 +33,7 @@ node {
       print "Publishing container to gcr.io/${env.GCP_PROJECT}/node-demo-app"
 
       sh "gcloud config set core/project ${PROJECT}"
+      sh "gcloud config set compute/zone ${ZONE}"
       sh "gcloud auth activate-service-account jenkins-demo-service-account@${PROJECT}.iam.gserviceaccount.com --key-file=/var/run/secrets/jenkins-demo-secrets/jenkins-demo-service-account.json"
       sh "gcloud container builds submit . --tag ${IMAGE_TAG}"
     }
