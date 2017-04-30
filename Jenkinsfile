@@ -45,12 +45,13 @@ node {
       env.PACKAGE_VERSION=sh(returnStdout: true, script: 'node -p -e "require(\'./package.json\').version"').trim()
 
       sh "gcloud config set core/project icoloma42"
+      sh "gcloud auth activate-service-account jenkins-demo-service-account@icoloma-42.iam.gserviceaccount.com --key-file=/var/run/secrets/jenkins-demo-secrets/jenkins-demo-service-account.json"
       sh "gcloud container builds submit . --tag gcr.io/icoloma42/node-demo-app" //" --tag version:${PACKAGE_VERSION}"
     }
 
     stage('Deploy') {
 
-        echo 'Kubernetes deploy goes here'
+      echo 'Kubernetes deploy goes here'
 
     }
 
