@@ -1,0 +1,10 @@
+# Build script
+# For the full list of built-in substitutions, see
+# https://cloud.google.com/container-builder/docs/concepts/build-requests#substitutions
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build', '--tag=gcr.io/$PROJECT_ID/node-demo-app:$BRANCH_NAME:$BUILD_ID', '.' ]
+- name: 'gcr.io/$PROJECT_ID/node-demo-app'
+  args: [ 'NODE_ENV=test', 'npm', 'test', '--no-color' ]
+
+images: [ 'gcr.io/$PROJECT_ID/node-demo-app' ]
