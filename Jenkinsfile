@@ -30,7 +30,7 @@ node {
 
     stage('Build Docker') {
 
-      print "Publishing container to gcr.io/${env.GCP_PROJECT}/node-demo-app"
+      print "Publishing container to gcr.io/${PROJECT}/node-demo-app"
 
       sh "gcloud config set core/project ${PROJECT}"
       sh "gcloud config set compute/zone ${ZONE}"
