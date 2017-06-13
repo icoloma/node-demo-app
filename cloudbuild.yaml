@@ -2,9 +2,35 @@
 # For the full list of built-in substitutions, see
 # https://cloud.google.com/container-builder/docs/concepts/build-requests#substitutions
 steps:
-- name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '--tag=gcr.io/$PROJECT_ID/node-demo-app:$BRANCH_NAME:$BUILD_ID', '.' ]
-- name: 'gcr.io/$PROJECT_ID/node-demo-app'
-  args: [ 'NODE_ENV=test', 'npm', 'test', '--no-color' ]
 
-images: [ 'gcr.io/$PROJECT_ID/node-demo-app' ]
+# Build docker image
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build', '--tag=gcr.io/$PROJECT_ID/node-demo-app:$TAG_NAME', '.' ]
+
+# Install the dependencies (just copy from the application)
+- name: 'gcr.io/$PROJECT_ID/node-demo-app:$TAG_NAME'
+  args: [ 'cp', '-R', '/app/node_modules', '.' ]
+
+# Run the tests
+- name: 'gcr.io/$PROJECT_ID/node-demo-app:$TAG_NAME'
+  args: [ 'npm', '--no-color', 'test' ]
+
+# Get credentials for kubectl
+- name: 'gcr.io/icoloma-42/kubernetes'
+  args: ['gcloud', 'container', 'clusters', 'get-credentials', 'demo-dev', '--zone', 'europe-west1-c', '--project', '$PROJECT_ID']
+
+# Update deployment with new release
+- name: 'ubuntu'
+  args: [ 'sed', '-i.bak', 's#gcr.io/$PROJECT_ID/node-demo-app:1.0.0#gcr.io/$PROJECT_ID/node-demo-app:$TAG_NAME#', 'k8s/app-deployment.yaml']
+
+# Deploy
+- name: 'gcr.io/icoloma-42/kubernetes'
+  args: ['kubectl', 'get', 'pods']
+
+- name: 'gcr.io/icoloma-42/kubernetes'
+  args: ['kubectl', 'apply', '-f', 'k8s/app-deployment.yaml']
+
+- name: 'gcr.io/icoloma-42/kubernetes'
+  args: ['echo', "http://`kubectl get service/node-demo-service --output=json | jq -r '.status.loadBalancer.ingress[0].ip'`"]
+
+images: [ 'gcr.io/$PROJECT_ID/node-demo-app:$TAG_NAME' ]
