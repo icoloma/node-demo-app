@@ -7,30 +7,25 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: [ 'build', '--tag=gcr.io/$PROJECT_ID/node-demo-app:$TAG_NAME', '.' ]
 
-# Install the dependencies (just copy from the application)
+# Install the dependencies (just copy from the application) and run the tests
 - name: 'gcr.io/$PROJECT_ID/node-demo-app:$TAG_NAME'
-  args: [ 'cp', '-R', '/app/node_modules', '.' ]
+  args:
+  - 'bash'
+  - '-c'
+  - |
+    cp -R /app/node_modules .
+    npm --no-color test
 
-# Run the tests
-- name: 'gcr.io/$PROJECT_ID/node-demo-app:$TAG_NAME'
-  args: [ 'npm', '--no-color', 'test' ]
-
-# Get credentials for kubectl
+# Get credentials for kubectl and deploy
 - name: 'gcr.io/icoloma-42/kubernetes'
-  args: ['gcloud', 'container', 'clusters', 'get-credentials', 'demo-dev', '--zone', 'europe-west1-c', '--project', '$PROJECT_ID']
-
-# Update deployment with new release
-- name: 'ubuntu'
-  args: [ 'sed', '-i.bak', 's#gcr.io/$PROJECT_ID/node-demo-app:1.0.0#gcr.io/$PROJECT_ID/node-demo-app:$TAG_NAME#', 'k8s/app-deployment.yaml']
-
-# Deploy
-- name: 'gcr.io/icoloma-42/kubernetes'
-  args: ['kubectl', 'get', 'pods']
-
-- name: 'gcr.io/icoloma-42/kubernetes'
-  args: ['kubectl', 'apply', '-f', 'k8s/app-deployment.yaml']
-
-- name: 'gcr.io/icoloma-42/kubernetes'
-  args: ['echo', "http://`kubectl get service/node-demo-service --output=json | jq -r '.status.loadBalancer.ingress[0].ip'`"]
+  args:
+  - 'bash'
+  - '-c'
+  - |
+    gcloud container clusters get-credentials demo-dev --zone europe-west1-c --project $PROJECT_ID
+    kubectl get pods
+    sed -i.bak s#gcr.io/$PROJECT_ID/node-demo-app:1.0.0#gcr.io/$PROJECT_ID/node-demo-app:$TAG_NAME# k8s/app-deployment.yaml
+    kubectl apply -f k8s/app-deployment.yaml
+    echo "http://`kubectl get service/node-demo-service --output=json | jq -r '.status.loadBalancer.ingress[0].ip'`"
 
 images: [ 'gcr.io/$PROJECT_ID/node-demo-app:$TAG_NAME' ]
