@@ -16,6 +16,10 @@ steps:
     cp -R /app/node_modules .
     npm --no-color test
 
+# publish the image
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'push', 'gcr.io/$PROJECT_ID/node-demo-app:$TAG_NAME']
+
 # Get credentials for kubectl and deploy
 - name: 'gcr.io/icoloma-42/kubernetes'
   args:
@@ -29,4 +33,4 @@ steps:
     echo "\(⌒▽⌒)/ Connect to http://$(kubectl get service node-demo-service --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}")"
     echo "=================="
 
-images: [ 'gcr.io/$PROJECT_ID/node-demo-app:$TAG_NAME' ]
+# images: [ 'gcr.io/$PROJECT_ID/node-demo-app:$TAG_NAME' ]
