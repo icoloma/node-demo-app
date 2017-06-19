@@ -1,6 +1,6 @@
 FROM node:7
 WORKDIR /app
-COPY static static
-COPY app.js package.json ./
+COPY package.json ./
 RUN npm install --no-color
+COPY static app.js ./
 CMD node app.js
