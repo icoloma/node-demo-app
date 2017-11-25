@@ -10,7 +10,7 @@
 node {
 
   currentBuild.result = "SUCCESS"
-  def PROJECT = 'icoloma-42'
+  def PROJECT = 'extrema-demos'
   def ZONE = 'europe-west1-c'
   def IMAGE_TAG = "gcr.io/${PROJECT}/node-demo-app:${env.BRANCH_NAME}.${env.BUILD_NUMBER}"
 
