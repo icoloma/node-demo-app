@@ -28,7 +28,7 @@ steps:
   - |
     gcloud container clusters get-credentials demo-dev --zone europe-west1-c --project $PROJECT_ID
     sed -i.bak s#gcr.io/$PROJECT_ID/node-demo-app:1.0.0#gcr.io/$PROJECT_ID/node-demo-app:$TAG_NAME# k8s/app-deployment.yaml
-    kubectl apply -f k8s/app-deployment.yaml
+    kubectl apply -f k8s
     echo "=================="
     echo "\(⌒▽⌒)/ Connect to http://$(kubectl get service node-demo-service --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}")"
     echo "=================="
