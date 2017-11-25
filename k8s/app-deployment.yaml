@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
         # the Jenkinsfile will replace this value with the build number
-        - image: gcr.io/icoloma-42/node-demo-app:1.0.0
+        - image: gcr.io/extrema-demos/node-demo-app:1.0.0
           name: node-demo-app
           ports:
             - containerPort: 3000
